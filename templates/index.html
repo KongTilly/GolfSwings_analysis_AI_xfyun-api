@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高尔夫挥杆分析 - 视频上传</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* 直接迁移 upload.html 的 style 部分 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0a3d2f 0%, #1a6b54 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .design-notes {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .design-notes h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #a8e6cf;
+        }
+        .design-notes ul {
+            padding-left: 20px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .design-notes li {
+            margin-bottom: 8px;
+        }
+        .mobile-prototype {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 375px;
+            margin: 0 auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #0a3d2f;
+            padding: 25px 20px 15px;
+            text-align: center;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        .content {
+            padding: 30px 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .upload-area {
+            width: 100%;
+            max-width: 300px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(10, 61, 47, 0.1);
+            border: 2px dashed #1a6b54;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        .upload-area.active {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .upload-icon {
+            font-size: 3.5rem;
+            color: #1a6b54;
+            margin-bottom: 15px;
+        }
+        .upload-text {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .upload-btn {
+            background: #1a6b54;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(26, 107, 84, 0.3);
+        }
+        .upload-btn:hover {
+            background: #0a3d2f;
+            transform: translateY(-2px);
+        }
+        .file-info {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .footer {
+            background: #fff;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+        }
+        .nav-item {
+            text-align: center;
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .nav-item.active {
+            color: #1a6b54;
+            font-weight: 500;
+        }
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        /* 演示视频按钮样式 */
+        .demo-video-section {
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto 30px auto;
+            text-align: center;
+        }
+        
+        .demo-video-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        
+        .demo-video-btn:hover {
+            background: linear-gradient(135deg, #ee5a24 0%, #d63031 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .demo-icon {
+            font-size: 1.2rem;
+        }
+        
+        .demo-text {
+            font-size: 1rem;
+        }
+        
+        /* 视频播放模态框样式 */
+        .video-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .video-modal-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .video-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .video-modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .video-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .video-modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .video-modal-content {
+                margin: 20px;
+                padding: 15px;
+            }
+            
+            .video-modal-title {
+                font-size: 1rem;
+            }
+        }
+        
+                 @media (min-width: 768px) {
+             body {
+                 flex-direction: row;
+                 padding: 30px;
+                 gap: 30px;
+             }
+             .design-notes {
+                 flex: 0 0 300px;
+                 margin-bottom: 0;
+                 align-self: flex-start;
+             }
+             .mobile-prototype {
+                 flex: 1;
+                 max-width: 100%;
+             }
+         }
+         
+         /* 悬浮按钮样式 */
+         .floating-demo-btn {
+             position: fixed;
+             bottom: 30px;
+             left: 50%;
+             transform: translateX(-50%);
+             background: linear-gradient(135deg, #e2e48a 0%, #a3c25a 100%);
+             border: none;
+             border-radius: 30px;
+             color: white;
+             font-size: 1rem;
+             font-weight: 500;
+             cursor: pointer;
+             box-shadow: 0 8px 25px rgba(162, 194, 90, 0.4);
+             transition: all 0.3s ease;
+             z-index: 1000;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             gap: 8px;
+             padding: 12px 20px;
+             white-space: nowrap;
+         }
+         
+         .floating-demo-btn:hover {
+             transform: translateX(-50%) translateY(-3px);
+             box-shadow: 0 12px 35px rgba(162, 194, 90, 0.6);
+         }
+         
+         
+         
+         @media (max-width: 768px) {
+             .floating-demo-btn {
+                 bottom: 20px;
+                 left: 50%;
+                 transform: translateX(-50%);
+                 padding: 10px 16px;
+                 font-size: 0.9rem;
+                 gap: 6px;
+             }
+             
+             .floating-demo-btn:hover {
+                 transform: translateX(-50%) translateY(-2px);
+             }
+         }
+    </style>
+</head>
+<body>
+    <!-- 上传要求弹窗 -->
+    <div id="uploadReqModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="upload-req-header">
+                <span class="upload-req-icon">📹</span>
+                <h2>上传视频要求</h2>
+            </div>
+            <div class="modal-scroll-content">
+                <p class="upload-req-warning">为保障动作分析准确性，请严格遵循以下拍摄要求：</p>
+                <ol class="upload-req-list">
+                    <li><b>一、视频拍摄要求</b>
+                        <ul>
+                            <li><span class="req-dot">①</span> <b>机位角度：</b> 必须使用正面平视角度拍摄（球员正对镜头）</li>
+                            <li><span class="req-dot">②</span> <b>画面范围（全程保持）：</b>
+                                <ul>
+                                    <li><span class="req-check">✅</span> <b>必须包含：</b></li>
+                                    <li>球员全身（头顶至脚底）</li>
+                                    <li>至少1/3球杆长度（从手柄到杆头方向计算）</li>
+                                    <li class="req-tip"><span class="req-star">⭐</span> <b>完整显示球杆，可提升动作分析精度30%以上</b></li>
+                                </ul>
+                            </li>
+                            <li><span class="req-dot">③</span> <b>起止动作：</b>
+                                <ul>
+                                    <li>起始画面：保持静态准备姿势≥1秒</li>
+                                    <li>结束画面：完成随挥动作至完全收杆</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><b>二、准备姿态规范</b></li>
+                </ol>
+                <div class="upload-req-pose">
+                    <img src="/static/uploads/standard/key_frames/uoload_standard.jpg" alt="准备姿态示意" class="pose-img">
+                    <ul class="pose-list">
+                        <li class="pose-warning"><span class="pose-icon">⚠️</span> 必须满足：</li>
+                        <li>双脚与肩同宽，自然站立</li>
+                        <li>球杆底部轻触地面</li>
+                        <li>双手放松握杆置于体前</li>
+                    </ul>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="document.getElementById('uploadReqModal').style.display='none'">我已知晓</button>
+        </div>
+    </div>
+    
+    <!-- 演示视频播放模态框 -->
+    <div id="videoModal" class="video-modal-overlay">
+        <div class="video-modal-content">
+            <div class="video-modal-header">
+                <div class="video-modal-title">高尔夫挥杆演示视频</div>
+                <button class="video-modal-close" onclick="closeVideoModal()">×</button>
+            </div>
+            <div class="video-container">
+                <video id="demoVideo" class="video-player" controls loop>
+                    <source src="/static/dome_show/index_dome_show.mp4" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+         <!-- 悬浮按钮 -->
+     <button class="floating-demo-btn" id="floatingDemoBtn" onclick="window.location.href='/demo_results'">
+         🎬演示视频分析结果展示
+         
+     </button>
+    <!-- 移动端原型 -->
+    <div class="mobile-prototype">
+        <div class="header">
+            <p>上传您的挥杆视频进行专业分析</p>
+        </div>
+        <div class="content">
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data" style="width:100%">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">⛳</div>
+                    <p class="upload-text">拖放视频文件或点击下方按钮</p>
+                    <input type="file" name="video" id="videoInput" accept="video/mp4,video/*" style="display:none" required>
+                    <button class="upload-btn" id="uploadBtn" type="button">选择视频文件</button>
+                    <button class="upload-btn" id="analyzeBtn" style="display:none;background:#4caf50;" type="submit">上传分析</button>
+                    <br/>
+                    <button class="guide-btn" type="button" onclick="window.location.href='/guide'">点击查看挥杆指南</button>
+                    <button class="history-btn" type="button" onclick="window.location.href='/history'">历史挥杆分析</button>
+                    <p class="file-info" id="fileInfo">支持 MP4 格式，最大 100MB</p>
+                </div>
+                <div id="progressContainer" style="display:none;margin-top:20px;">
+                    <div style="background:#eee;border-radius:8px;overflow:hidden;height:18px;">
+                        <div id="progressBar" style="height:18px;width:0;background:#4caf50;transition:width 0.3s;"></div>
+                    </div>
+                    <div id="progressText" style="margin-top:8px;text-align:center;color:#4caf50;font-weight:bold;">分析中... 0%</div>
+                    <div id="progressStage" style="margin-top:4px;text-align:center;color:#888;font-size:13px;">阶段：检测动作</div>
+                </div>
+            </form>
+            
+            <!-- 演示视频按钮 -->
+            <div class="demo-video-section">
+                <button class="demo-video-btn" id="demoVideoBtn" type="button">
+                    <span class="demo-icon">🎬</span>
+                    <span class="demo-text">观看演示视频</span>
+                </button>
+            </div>
+            
+            <!-- 上传要求说明 -->
+            <div class="design-notes upload-requirements-card">
+                <div class="upload-req-header">
+                    <span class="upload-req-icon">📹</span>
+                    <h2>上传视频要求</h2>
+                </div>
+                <p class="upload-req-warning">为保障动作分析准确性，请严格遵循以下拍摄要求：</p>
+                <ol class="upload-req-list">
+                    <li><b>一、视频拍摄要求</b>
+                        <ul>
+                            <li><span class="req-dot">①</span> <b>机位角度：</b> 必须使用正面平视角度拍摄（球员正对镜头）</li>
+                            <li><span class="req-dot">②</span> <b>画面范围（全程保持）：</b>
+                                <ul>
+                                    <li><span class="req-check">✅</span> <b>必须包含：</b></li>
+                                    <li>球员全身（头顶至脚底）</li>
+                                    <li>至少1/3球杆长度（从手柄到杆头方向计算）</li>
+                                    <li class="req-tip"><span class="req-star">⭐</span> <b>完整显示球杆，可提升动作分析精度30%以上</b></li>
+                                </ul>
+                            </li>
+                            <li><span class="req-dot">③</span> <b>起止动作：</b>
+                                <ul>
+                                    <li>起始画面：保持静态准备姿势≥2秒</li>
+                                    <li>结束画面：完成随挥动作至完全收杆</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><b>二、准备姿态规范</b></li>
+                </ol>
+                <div class="upload-req-pose">
+                    <img src="/static/uploads/standard/key_frames/uoload_standard.jpg" alt="准备姿态示意" class="pose-img">
+                    <ul class="pose-list">
+                        <li class="pose-warning"><span class="pose-icon">⚠️</span> 必须满足：</li>
+                        <li>双脚与肩同宽，自然站立</li>
+                        <li>球杆底部轻触地面</li>
+                        <li>双手放松握杆置于体前</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- 删除底部footer导航栏 -->
+        <!-- <div class="footer">
+            <div class="nav-item">
+                <div class="nav-icon">📊</div>
+                <div>分析</div>
+            </div>
+            <div class="nav-item active">
+                <div class="nav-icon">📤</div>
+                <div>上传</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">📋</div>
+                <div>报告</div>
+            </div>
+        </div> -->
+    </div>
+    <script>
+        // 弹窗自动弹出
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('uploadReqModal').style.display = 'flex';
+        });
+        
+        // 演示视频相关功能
+        const demoVideoBtn = document.getElementById('demoVideoBtn');
+        const videoModal = document.getElementById('videoModal');
+        const demoVideo = document.getElementById('demoVideo');
+        
+        // 演示视频按钮点击事件
+        demoVideoBtn.addEventListener('click', function() {
+            openVideoModal();
+        });
+        
+        // 打开视频模态框
+        function openVideoModal() {
+            videoModal.style.display = 'flex';
+            // 预加载视频
+            demoVideo.load();
+            // 设置视频循环播放
+            demoVideo.loop = true;
+            // 自动播放（需要用户交互）
+            demoVideo.play().catch(function(error) {
+                console.log('自动播放失败，需要用户手动点击播放:', error);
+            });
+        }
+        
+        // 关闭视频模态框
+        function closeVideoModal() {
+            videoModal.style.display = 'none';
+            // 暂停视频
+            demoVideo.pause();
+            // 重置视频到开始位置
+            demoVideo.currentTime = 0;
+        }
+        
+        // 点击模态框背景关闭
+        videoModal.addEventListener('click', function(e) {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+        
+                 // ESC键关闭模态框
+         document.addEventListener('keydown', function(e) {
+             if (e.key === 'Escape' && videoModal.style.display === 'flex') {
+                 closeVideoModal();
+             }
+         });
+        
+        // 获取DOM元素
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileInput = document.getElementById('videoInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressStage = document.getElementById('progressStage');
+        let currentTaskId = null;
+        let currentSubdir = null;
+        let pollCount = 0;
+        const MAX_POLL_COUNT = 60; // 最大轮询60次（60秒）
+        // 按钮点击触发文件选择
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        // 文件选择处理
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                fileInfo.textContent = `已选择: ${file.name} (${formatFileSize(file.size)})`;
+                fileInfo.style.color = '#1a6b54';
+                fileInfo.style.fontWeight = '500';
+                // 隐藏选择按钮，显示上传分析按钮
+                uploadBtn.style.display = 'none';
+                analyzeBtn.style.display = 'inline-block';
+            }
+        });
+        // 拖拽交互效果
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            else return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        // 拦截表单提交，AJAX上传
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!fileInput.files.length) return;
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+            uploadBtn.disabled = true;
+            analyzeBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0';
+            progressText.textContent = '分析中... 0%';
+            // AJAX上传
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.task_id) {
+                    currentTaskId = data.task_id;
+                    currentSubdir = data.subdir;
+                    pollCount = 0; // 重置轮询计数器
+                    pollProgress();
+                } else {
+                    progressText.textContent = '上传失败，请重试';
+                }
+            })
+            .catch(() => {
+                progressText.textContent = '上传失败，请重试';
+            });
+        });
+        // 轮询进度
+        function pollProgress() {
+            if (!currentTaskId || !currentSubdir) return;
+            
+            // 检查是否超过最大轮询次数
+            pollCount++;
+            if (pollCount > MAX_POLL_COUNT) {
+                progressText.textContent = '分析超时，正在跳转...';
+                setTimeout(() => {
+                    window.location.href = `/results/${currentSubdir}/${currentTaskId}`;
+                }, 1000);
+                return;
+            }
+            
+            fetch(`/progress/${currentSubdir}/${currentTaskId}?_t=${Date.now()}`)
+                .then(res => res.json())
+                .then(data => {
+                    let percent = data.percent || 0;
+                    let stage = data.stage || 'detect';
+                    progressBar.style.width = percent + '%';
+                    let stageText = '';
+                    if (stage === 'detect') {
+                        stageText = '阶段：检测动作';
+                    } else if (stage === 'analyze') {
+                        stageText = '阶段：分析动作';
+                    }
+                    progressStage.textContent = stageText;
+                    progressText.textContent = `分析中... ${percent}%`;
+                    if (percent < 100) {
+                        setTimeout(pollProgress, 1000);
+                    } else {
+                        progressText.textContent = '分析完成，正在跳转...';
+                        // 分析完成后直接跳转到结果页面
+                        setTimeout(() => {
+                            window.location.href = `/results/${currentSubdir}/${currentTaskId}`;
+                        }, 1000);
+                    }
+                })
+                .catch(() => {
+                    setTimeout(pollProgress, 1500);
+                });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Web框架
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# 计算机视觉和图像处理
+opencv-python==4.8.1.78
+numpy==1.24.3
+Pillow==10.0.1
+
+# 深度学习框架
+torch==2.0.1
+torchvision==0.15.2
+ultralytics==8.0.196
+
+# WebSocket客户端
+websocket-client==1.6.4
+
+# 数据处理
+pandas==2.0.3
+
+# 系统工具
+psutil==5.9.5 

@@ -1,0 +1,10 @@
+{
+  "image_path": "uploads/20250801_1808_fast/key_frames/Top_of_Backswing_77.jpg",
+  "subdir": "20250801_1808_fast",
+  "filename": "Top_of_Backswing_77.jpg",
+  "description": "从图片看，你的上杆顶点技术存在一些需改进之处。上杆幅度方面，球杆与地面夹角接近0.4°（正确），但肩部X位置和中心角度有偏差，分别为318.1°和361.0°，显示身体旋转不够充分。手臂位置上，右臂在顶点处未完全伸直，可能影响击球力量与精准度。上杆顶点时，应确保身体充分旋转，手臂自然伸展，以优化击球效果。",
+  "prompt": "Top_of_Backswing动作",
+  "action": "Top_of_Backswing",
+  "frame_idx": 77,
+  "timestamp": "2025-08-01T18:09:23.570965"
+}

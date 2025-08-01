@@ -1,0 +1,10 @@
+{
+  "image_path": "uploads/20250801_1808_fast/key_frames/Preparation_1.jpg",
+  "subdir": "20250801_1808_fast",
+  "filename": "Preparation_1.jpg",
+  "description": "从图片来看，你的站位基本正确，双脚与肩同宽，身体重心均匀分布。握杆姿势看起来稳固，双手紧握球杆，手腕保持自然弯曲。身体平衡良好，背部挺直，头部保持稳定。准备阶段要点：确保站姿稳定，握杆放松但有力，身体各部分协调一致，为击球做好准备。",
+  "prompt": "Preparation动作",
+  "action": "Preparation",
+  "frame_idx": 1,
+  "timestamp": "2025-08-01T18:09:23.570965"
+}

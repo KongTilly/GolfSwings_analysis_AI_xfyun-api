@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>历史挥杆分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .history-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .history-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #0a3d2f;
+        }
+        
+        .history-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .history-header p {
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .history-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #1a6b54;
+        }
+        
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .history-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0a3d2f;
+        }
+        
+        .history-item-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .history-item-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .info-icon {
+            font-size: 1.1rem;
+        }
+        
+        .history-item-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .view-btn {
+            background: #1a6b54;
+            color: white;
+        }
+        
+        .view-btn:hover {
+            background: #0a3d2f;
+            transform: translateY(-1px);
+        }
+        
+        .download-btn {
+            background: #ff6b35;
+            color: white;
+        }
+        
+        .download-btn:hover {
+            background: #e55a2b;
+            transform: translateY(-1px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #1a6b54;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(26,107,84,0.3);
+        }
+        
+        .back-btn:hover {
+            background: #0a3d2f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26,107,84,0.4);
+        }
+        
+        @media (max-width: 600px) {
+            .history-container {
+                padding: 10px;
+            }
+            
+            .history-item-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .history-item-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .history-item-actions {
+                justify-content: center;
+            }
+            
+            .back-btn {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← 返回首页</a>
+    
+    <div class="history-container">
+        <div class="history-header">
+            <h1>历史挥杆分析</h1>
+            <p>查看您之前分析过的挥杆视频</p>
+        </div>
+        
+        {% if history_list %}
+            <div class="history-list">
+                {% for item in history_list %}
+                <div class="history-item">
+                    <div class="history-item-header">
+                        <div class="history-item-title">{{ item.original_video }}</div>
+                        <div class="history-item-time">{{ item.analysis_time }}</div>
+                    </div>
+                    
+                    <div class="history-item-info">
+                        <div class="info-item">
+                            <span class="info-icon">📹</span>
+                            <span>原始视频</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🖼️</span>
+                            <span>{{ item.keyframe_count }} 个关键帧</span>
+                        </div>
+                    </div>
+                    
+                    <div class="history-item-actions">
+                        <a href="/results/{{ item.subdir }}/{{ item.original_video }}" class="action-btn view-btn">
+                            查看分析结果
+                        </a>
+                        <a href="/download/{{ item.subdir }}/{{ item.original_video }}" class="action-btn download-btn">
+                            下载分析视频
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">📁</div>
+                <h3>暂无历史分析记录</h3>
+                <p>您还没有上传过视频进行分析，快去上传您的第一个挥杆视频吧！</p>
+                <br>
+                <a href="/" class="action-btn view-btn">开始分析</a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html> 

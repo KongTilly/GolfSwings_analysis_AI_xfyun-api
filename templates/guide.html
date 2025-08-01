@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高尔夫挥杆分析 - 正确姿态指南</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0a3d2f 0%, #1a6b54 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .design-notes {
+            background: rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 14px 16px 10px 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .design-notes h2 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #a8e6cf;
+        }
+        .design-notes ul { padding-left: 18px; font-size: 0.85rem; line-height: 1.5; }
+        .design-notes li { margin-bottom: 6px; }
+        .mobile-prototype {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+            max-width: 375px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #0a3d2f;
+            padding: 20px 16px 12px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+        .header p { font-size: 0.9rem; opacity: 0.8; }
+        .content {
+            padding: 18px 12px 10px 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .guide-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 14px 10px 10px 10px;
+            margin-bottom: 14px;
+        }
+        .guide-title { font-size: 1.1rem; color: #1a6b54; font-weight: 600; margin-bottom: 10px; text-align: center; }
+        .guide-step {
+            margin-bottom: 14px;
+        }
+        .guide-step-title {
+            font-size: 1rem;
+            color: #1a6b54;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .guide-step-list {
+            font-size: 0.97rem;
+            color: #333;
+            line-height: 1.7;
+            margin-left: 10px;
+        }
+        .guide-imgs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .guide-img-item {
+            width: 90px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(26,107,84,0.07);
+            text-align: center;
+            overflow: hidden;
+        }
+        .guide-img { width: 100%; height: 80px; object-fit: contain; border-radius: 10px 10px 0 0; background: #fff; }
+        .guide-label { font-size: 0.78rem; color: #1a6b54; padding: 2px 0 4px 0; }
+        .guide-summary {
+            background: #e8f5e9;
+            border-radius: 12px;
+            padding: 10px 10px 8px 10px;
+            margin-top: 10px;
+            color: #1a6b54;
+            font-size: 0.98rem;
+        }
+        .footer {
+            background: #fff;
+            padding: 10px 0 8px 0;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 0 0 24px 24px;
+        }
+        .footer-btn {
+            background: #1a6b54;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 32px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(26,107,84,0.13);
+            transition: background 0.2s;
+        }
+        .footer-btn:active, .footer-btn:hover { background: #0a3d2f; }
+        @media (min-width: 768px) {
+            body { flex-direction: row; padding: 30px; gap: 30px; }
+            .design-notes { flex: 0 0 300px; margin-bottom: 0; align-self: flex-start; }
+            .mobile-prototype { flex: 1; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-prototype">
+        <div class="header">
+            <p>高尔夫标准挥杆分解与关键要素</p>
+        </div>
+        <div class="content" style="padding-bottom: 120px;">
+            <!-- 标准挥杆十步详解 -->
+            <section class="guide-section">
+                <div class="guide-title">标准挥杆十步详解 <span style="font-size:0.95em;color:#888;">(10 Key Steps of Standard Golf Swing)</span></div>
+                <!-- 1. 准备姿势 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">1. 准备姿势 (Setup)</div>
+                    <ul class="guide-step-list">
+                        <li><strong>站位 (Stance):</strong> 双脚与肩同宽（铁杆）或略宽（木杆），脚趾外展10-15°，重心均匀，膝微屈，臀部后翘，脊柱自然挺直，肩膀放松平行目标线。</li>
+                        <li><strong>握杆 (Grip):</strong> 自然连接，重叠/互锁/十指式，力度适中，左手背指向目标，右手包覆左拇指，V字指向右肩和下巴间。</li>
+                        <li><strong>球位 (Ball Position):</strong> 短铁杆居中，长铁/木杆靠左脚跟内侧，一号木最靠前。</li>
+                        <li><strong>瞄准 (Alignment):</strong> 杆面正对目标，身体各部位与目标线平行，头部在球后，眼睛注视球。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3320.png') }}" alt="准备姿势 Setup">
+                            <div class="guide-label">准备姿势<br>Setup</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 2. 起杆 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">2. 起杆 (Takeaway)</div>
+                    <ul class="guide-step-list">
+                        <li>肩膀、手臂、手和球杆整体同步启动，身体转动带动手臂和球杆，杆头贴地后移，手腕自然形成角度。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3330.png') }}" alt="起杆 Takeaway">
+                            <div class="guide-label">起杆<br>Takeaway</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 3. 上杆 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">3. 上杆 (Backswing)</div>
+                    <ul class="guide-step-list">
+                        <li>肩部主导转动，手臂上抬，重心转移到右脚内侧，右膝稳定，手腕上翘形成滞后角度。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3338.png') }}" alt="上杆 Backswing">
+                            <div class="guide-label">上杆<br>Backswing</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 4. 上杆顶点 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">4. 上杆顶点 (Top of Backswing)</div>
+                    <ul class="guide-step-list">
+                        <li>左肩到下巴下，球杆指向目标，重心在右脚，右肘弯曲，左臂伸直，脊柱角度不变，头部稳定。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3346.png') }}" alt="上杆顶点 Top of Backswing">
+                            <div class="guide-label">上杆顶点<br>Top of Backswing</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. 下杆 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">5. 下杆 (Downswing)</div>
+                    <ul class="guide-step-list">
+                        <li>下半身（髋部、腿）启动，左脚跟踩实，重心转向左腿，髋部积极旋转带动上半身。</li>
+                        <li>保持手腕滞后角度，手臂被动跟随，顺序为：脚→膝→髋→躯干→肩→手臂→手腕→杆头，力量如鞭传递。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3354.png') }}" alt="下杆 Downswing">
+                            <div class="guide-label">下杆<br>Downswing</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 6. 击球前 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">6. 击球前 (Pre-Impact)</div>
+                    <ul class="guide-step-list">
+                        <li>髋部大幅打开，肩膀接近方正，头部在球后，重心在左脚，左腿伸直，手腕开始释放。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3362.png') }}" alt="击球前 Pre-Impact">
+                            <div class="guide-label">击球前<br>Pre-Impact</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 7. 击球瞬间 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">7. 击球瞬间 (Impact)</div>
+                    <ul class="guide-step-list">
+                        <li>双手在球前方，左手背平直，杆面正对目标，击中球后甜蜜点。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3370.png') }}" alt="击球瞬间 Impact">
+                            <div class="guide-label">击球瞬间<br>Impact</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 8. 释放 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">8. 释放 (Release)</div>
+                    <ul class="guide-step-list">
+                        <li>击球后手腕能量释放，杆头加速通过击球区，身体继续转动，双臂充分伸展，右肩指向目标，重心稳在左腿。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3378.png') }}" alt="释放 Release">
+                            <div class="guide-label">释放<br>Release</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 9. 随挥 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">9. 随挥 (Follow-Through)</div>
+                    <ul class="guide-step-list">
+                        <li>身体继续转动，重心转移到左脚，杆头沿挥杆平面前进，动作流畅。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3386.png') }}" alt="随挥 Follow-Through">
+                            <div class="guide-label">随挥<br>Follow-Through</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 10. 收杆 -->
+                <div class="guide-step">
+                    <div class="guide-step-title">10. 收杆 (Finish)</div>
+                    <ul class="guide-step-list">
+                        <li>身体完全转向目标，胸部正对目标，右肩低于左肩，右腿前提点地，球杆自然挥至身后，双手高举，保持平衡舒展。</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3394.png') }}" alt="收杆 Finish">
+                            <div class="guide-label">收杆<br>Finish</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- 准备姿势参考线 -->
+            <section class="guide-section">
+                <div class="guide-title">准备姿势参考线 <span style="font-size:0.95em;color:#888;">(Setup Reference Lines)</span></div>
+                <div class="guide-step">
+                    <div class="guide-step-title">参考线的作用 (Purpose of Reference Lines)</div>
+                    <ul class="guide-step-list">
+                        <li>参考线用于观察击球者在挥杆过程中的变化，帮助判断站位是否正确，以及身体各部位的运动轨迹。</li>
+                        <li>这些参考线基于1点钟方向的视角，为高尔夫挥杆分析提供标准化的观察基准。</li>
+                    </ul>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">1. 脚跟线 (Heel Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的脚跟线作为参考线</li>
+                        <li>作用：观察击球者在挥杆过程中的变化，判断站位是否正确</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3407.png') }}" alt="脚跟线 Heel Line">
+                            <div class="guide-label">脚跟线<br>Heel Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">2. 膝盖线和脚踝线 (Knee and Ankle Lines)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的膝盖线和脚踝线</li>
+                        <li>作用：观察站位是否稳定，以及挥杆过程中膝盖的变化</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3452.png') }}" alt="膝盖线和脚踝线 Knee and Ankle Lines">
+                            <div class="guide-label">膝盖线和脚踝线<br>Knee and Ankle Lines</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">3. 腋窝-膝盖-脚踝线 (Armpit-Knee-Ankle Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的腋窝-膝盖-脚踝垂直线</li>
+                        <li>作用：判断站位是否稳定，确保手臂下垂时，腋窝、膝盖和脚踝在一条铅垂线上</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3492.png') }}" alt="腋窝-膝盖-脚踝线 Armpit-Knee-Ankle Line">
+                            <div class="guide-label">腋窝-膝盖-脚踝线<br>Armpit-Knee-Ankle Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">4. 头部位置线 (Head Position Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的头部位置</li>
+                        <li>作用：作为参考线观察挥杆过程中头部位置变化</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3547.png') }}" alt="头部位置线 Head Position Line">
+                            <div class="guide-label">头部位置线<br>Head Position Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">5. 双手状态线 (Hands State Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的双手状态</li>
+                        <li>作用：判断站位是否稳定，作为参考线观察挥杆过程中肩部运动</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3580.png') }}" alt="双手状态线 Hands State Line">
+                            <div class="guide-label">双手状态线<br>Hands State Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">6. 脚踝线 (Ankle Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的脚踝线</li>
+                        <li>作用：判断站位正确性，作为参考线观察脚踝运动</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3622.png') }}" alt="脚踝线 Ankle Line">
+                            <div class="guide-label">脚踝线<br>Ankle Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">7. 臀部垂直参考线 (Hip Vertical Reference)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的臀部垂直参考线</li>
+                        <li>作用：作为参考线观察臀部在挥杆过程中的变化</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3662.png') }}" alt="臀部垂直参考线 Hip Vertical Reference">
+                            <div class="guide-label">臀部垂直参考线<br>Hip Vertical Reference</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">8. 后方方向参考线 (Back Direction Reference)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的后方方向参考线</li>
+                        <li>作用：作为参考线观察后方挥杆时的运动</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3698.png') }}" alt="后方方向参考线 Back Direction Reference">
+                            <div class="guide-label">后方方向参考线<br>Back Direction Reference</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">9. 后方方向垂直参考线 (Back Direction Vertical Reference)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的后方方向垂直参考线</li>
+                        <li>作用：作为参考观察下杆时的运动</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3734.png') }}" alt="后方方向垂直参考线 Back Direction Vertical Reference">
+                            <div class="guide-label">后方方向垂直参考线<br>Back Direction Vertical Reference</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">10. 前方方向参考线 (Front Direction Reference)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的前方方向参考线</li>
+                        <li>作用：作为参考线观察挥杆时的运动，以及观察双手在双脚上的分布</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3770.png') }}" alt="前方方向参考线 Front Direction Reference">
+                            <div class="guide-label">前方方向参考线<br>Front Direction Reference</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">11. 前方方向垂直参考线 (Front Direction Vertical Reference)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：1点钟方向的前方方向垂直参考线</li>
+                        <li>作用：观察站位是否稳定，同时作为参考线观察肩部运动</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3817.png') }}" alt="前方方向垂直参考线 Front Direction Vertical Reference">
+                            <div class="guide-label">前方方向垂直参考线<br>Front Direction Vertical Reference</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">12. 双脚垂直线 (Feet Vertical Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：双脚垂直线</li>
+                        <li>作用：作为参考线要用于观察击球者在双脚上的前后分布</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3863.png') }}" alt="双脚垂直线 Feet Vertical Line">
+                            <div class="guide-label">双脚垂直线<br>Feet Vertical Line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="guide-step">
+                    <div class="guide-step-title">13. 挥杆平面参考线 (Swing Plane Reference Line)</div>
+                    <ul class="guide-step-list">
+                        <li>位置：挥杆平面参考线</li>
+                        <li>作用：主要用于显示挥杆平面时的实际的挥杆平面实时显示，在视频上，这里用一张图片表示，在挥杆过程中不要偏离这个平面</li>
+                    </ul>
+                    <div class="guide-imgs">
+                        <div class="guide-img-item">
+                            <img class="guide-img" src="{{ url_for('static', filename='uploads/standard/guide/wz3896.png') }}" alt="挥杆平面参考线 Swing Plane Reference Line">
+                            <div class="guide-label">挥杆平面参考线<br>Swing Plane Reference Line</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- 保留原有标准要素总结 -->
+            <div class="guide-summary">
+                <div class="guide-step-title" style="margin-bottom:4px;">标准挥杆的关键要素总结 <span style="font-size:0.95em;color:#888;">(Key Elements Summary)</span></div>
+                <ul style="margin-left:10px;">
+                    <li><strong>节奏与平衡 (Rhythm & Balance):</strong> 动作流畅有节奏，始终保持平衡。</li>
+                    <li><strong>身体转动 (Body Rotation):</strong> 动力源自肩髋旋转，手臂传递力量。</li>
+                    <li><strong>重心转移 (Weight Transfer):</strong> 上杆到右脚，下杆送杆到左脚，保证力量与稳定。</li>
+                    <li><strong>滞后角度与释放 (Lag & Release):</strong> 顶点储存手腕角度，下杆延迟释放，提升杆头速度。</li>
+                    <li><strong>脊柱角度 (Spine Angle):</strong> 准备到击球保持脊柱前倾，头部高度稳定。</li>
+                    <li><strong>挥杆平面 (Swing Plane):</strong> 杆头在合理平面运动，稳定击球方向。</li>
+                    <li><strong>一致性 (Consistency):</strong> 反复练习，形成肌肉记忆，动作一致。</li>
+                </ul>
+            </div>
+        </div>
+        <!-- 悬浮返回按钮 -->
+        <button class="floating-back-btn" onclick="window.history.back()">返回</button>
+    </div>
+    <script>
+        // 图片放大交互
+        const guideImgs = document.querySelectorAll('.guide-img');
+        guideImgs.forEach(img => {
+            img.addEventListener('click', function() {
+                const modal = document.createElement('div');
+                modal.style.position = 'fixed';
+                modal.style.left = 0;
+                modal.style.top = 0;
+                modal.style.width = '100vw';
+                modal.style.height = '100vh';
+                modal.style.background = 'rgba(0,0,0,0.85)';
+                modal.style.display = 'flex';
+                modal.style.alignItems = 'center';
+                modal.style.justifyContent = 'center';
+                modal.style.zIndex = 9999;
+                const bigImg = document.createElement('img');
+                bigImg.src = img.src;
+                bigImg.style.maxWidth = '90vw';
+                bigImg.style.maxHeight = '70vh';
+                bigImg.style.borderRadius = '16px';
+                bigImg.style.boxShadow = '0 8px 32px rgba(0,0,0,0.25)';
+                modal.appendChild(bigImg);
+                modal.addEventListener('click', function() { document.body.removeChild(modal); });
+                document.body.appendChild(modal);
+            });
+        });
+    </script>
+</body>
+</html> 

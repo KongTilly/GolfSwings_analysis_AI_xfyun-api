@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI分析结果 - 高尔夫挥杆分析</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0a3d2f 0%, #1a6b54 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .mobile-prototype {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+            max-width: 375px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #0a3d2f;
+            padding: 20px 16px 12px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+        .header p { font-size: 0.9rem; opacity: 0.8; }
+        .content {
+            padding: 18px 12px 10px 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .analysis-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 14px 10px 10px 10px;
+            margin-bottom: 14px;
+        }
+        .analysis-title { 
+            font-size: 1.1rem; 
+            color: #1a6b54; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            text-align: center; 
+        }
+        .action-item {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #1a6b54;
+        }
+        .action-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            background: #1a6b54;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .action-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a6b54;
+        }
+        .action-image {
+            width: 100%;
+            max-width: 280px;
+            height: 180px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #fff;
+            margin: 8px 0;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .action-image:hover {
+            transform: scale(1.02);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0);
+            backdrop-filter: blur(0px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.show {
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.show .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .modal-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #fff;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        .modal.show .close {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .close:hover {
+            background: rgba(0,0,0,0.7);
+            transform: scale(1.1);
+        }
+        .analysis-content {
+            background: #e8f5e9;
+            color: #1a6b54;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 8px;
+        }
+        .timestamp {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 6px;
+            text-align: right;
+        }
+        .no-data {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+        }
+        .footer {
+            background: #fff;
+            padding: 10px 0 8px 0;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 0 0 24px 24px;
+        }
+        .footer-btn {
+            background: #1a6b54;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 32px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(26,107,84,0.13);
+            transition: background 0.2s;
+        }
+        .footer-btn:active, .footer-btn:hover { background: #0a3d2f; }
+        .back-btn {
+            background: #ff6b35;
+        }
+        .back-btn:hover { background: #e55a2b; }
+        @media (min-width: 768px) {
+            body { padding: 30px; }
+            .mobile-prototype { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-prototype">
+        <div class="header">
+            <p>GolfSwingsAssistant-AI分析您的挥杆动作</p>
+        </div>
+        <div class="content">
+            <div class="analysis-section">
+                <div class="analysis-title">动作分析详情</div>
+                
+                {% if ai_results %}
+                    {% for result in ai_results %}
+                    <div class="action-item" data-json="{{ result.user_json if result.user_json else '' }}">
+                        <div class="action-header">
+                            <div class="action-icon">{{ loop.index }}</div>
+                            <div class="action-name">
+                                {% if result.action == 'Preparation' %}
+                                    准备动作
+                                {% elif result.action == 'Top_of_Backswing' %}
+                                    上杆顶点
+                                {% elif result.action == 'Impact' %}
+                                    击球瞬间
+                                {% elif result.action == 'Finish' %}
+                                    收杆动作
+                                {% else %}
+                                    {{ result.action }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if result.image_path %}
+                        <img class="action-image" src="{{ url_for('static', filename=result.image_path) }}" 
+                             alt="{{ result.action }}动作图片" onclick="openModal(this.src, '{{ result.action }}')">
+                        {% endif %}
+                        
+                        <div class="analysis-content" id="analysis-content-{{ loop.index0 }}">
+                            {% if result.description %}
+                                {{ result.description }}
+                            {% else %}
+                                <div class="no-data">暂无分析结果</div>
+                            {% endif %}
+                        </div>
+                        
+                        {% if result.timestamp %}
+                        <div class="timestamp">
+                            分析时间: {{ result.timestamp[:19].replace('T', ' ') }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">
+                        暂无AI分析结果<br>
+                        请确保分析过程已完成
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="footer-btn back-btn" onclick="window.history.back()">返回结果页</button>
+            <button class="footer-btn" onclick="window.location.href='{{ url_for('index') }}'">开始新的分析</button>
+        </div>
+    </div>
+    
+    <!-- 模态框 -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="">
+        </div>
+    </div>
+    
+    <script>
+        function openModal(imageSrc, actionName) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageSrc;
+            modalImage.alt = actionName + '动作图片';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            // 强制重绘后添加动画类
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+            
+            // 等待动画完成后隐藏模态框
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+        
+        // 点击模态框背景关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // 加载JSON分析数据
+        function loadJsonAnalysisData() {
+            const actionItems = document.querySelectorAll('.action-item');
+            
+            actionItems.forEach((item, index) => {
+                // 检查是否有JSON数据需要加载
+                const jsonPath = item.dataset.json;
+                if (jsonPath) {
+                    loadAnalysisFromJson(jsonPath, index);
+                }
+            });
+        }
+        
+        // 从JSON文件加载分析数据
+        function loadAnalysisFromJson(jsonPath, index) {
+            const analysisContent = document.getElementById(`analysis-content-${index}`);
+            if (!analysisContent) return;
+            
+            // 显示加载状态
+            analysisContent.innerHTML = '<div class="no-data">正在加载分析结果...</div>';
+            
+            // 加载JSON文件
+            fetch(jsonPath)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.description) {
+                        analysisContent.innerHTML = data.description;
+                    } else {
+                        analysisContent.innerHTML = '<div class="no-data">暂无分析结果</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('加载分析结果失败:', error);
+                    analysisContent.innerHTML = '<div class="no-data">加载分析结果失败，请稍后重试。</div>';
+                });
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadJsonAnalysisData();
+        });
+    </script>
+</body>
+</html> 

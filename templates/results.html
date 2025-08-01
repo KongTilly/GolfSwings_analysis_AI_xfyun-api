@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>高尔夫挥杆分析 - 结果</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #0a3d2f 0%, #1a6b54 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .design-notes {
+            background: rgba(255,255,255,0.12);
+            border-radius: 16px;
+            padding: 14px 16px 10px 16px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .design-notes h2 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #a8e6cf;
+        }
+        .design-notes ul { padding-left: 18px; font-size: 0.85rem; line-height: 1.5; }
+        .design-notes li { margin-bottom: 6px; }
+        .mobile-prototype {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+            max-width: 375px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #0a3d2f;
+            padding: 20px 16px 12px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.2rem; font-weight: 600; margin-bottom: 4px; }
+        .header p { font-size: 0.9rem; opacity: 0.8; }
+        .content {
+            padding: 18px 12px 10px 12px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .video-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 14px 10px 10px 10px;
+            margin-bottom: 14px;
+        }
+        .video-title { font-size: 1rem; color: #1a6b54; font-weight: 500; margin-bottom: 8px; text-align: center; }
+        .video-controls { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
+        .video-btn {
+            padding: 6px 14px;
+            background: #e8f5e9;
+            color: #1a6b54;
+            border: none;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .video-btn.active, .video-btn:active {
+            background: #1a6b54;
+            color: #fff;
+        }
+        .video-player {
+            width: 100%;
+            border-radius: 12px;
+            background: #000;
+            margin-bottom: 6px;
+        }
+        .download-link {
+            display: block;
+            text-align: center;
+            color: #1a6b54;
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            text-decoration: underline;
+        }
+        .keyframes-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 12px 8px 8px 8px;
+            margin-bottom: 12px;
+        }
+        .keyframes-title { font-size: 1rem; color: #1a6b54; font-weight: 500; margin-bottom: 8px; text-align: center; }
+        .keyframes-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .keyframe-item {
+            width: 80px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(26,107,84,0.07);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+        .keyframe-item:hover { transform: scale(1.04); }
+        .keyframe-img { width: 100%; height: 80px; object-fit: contain; border-radius: 10px 10px 0 0; background: #fff; }
+        .keyframe-label { font-size: 0.78rem; color: #1a6b54; padding: 2px 0 4px 0; }
+        .report-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 10px 8px 8px 8px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .report-title { font-size: 1rem; color: #1a6b54; font-weight: 500; margin-bottom: 6px; }
+        .report-btn {
+            background: #1a6b54;
+            color: #fff;
+            border: none;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+        .report-btn:hover { background: #0a3d2f; }
+        .ai-analysis-btn {
+            background: #ff6b35;
+            color: #fff;
+            border: none;
+            border-radius: 18px;
+            padding: 8px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        .ai-analysis-btn:hover { background: #e55a2b; }
+        
+        /* 分析结果区域样式 */
+        .analysis-section {
+            width: 100%;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(10,61,47,0.08);
+            padding: 12px 8px 8px 8px;
+            margin-bottom: 12px;
+        }
+        .analysis-title {
+            font-size: 1rem;
+            color: #1a6b54;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .analysis-content {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #333;
+        }
+        .analysis-content h4 {
+            color: #1a6b54;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .analysis-content p {
+            margin-bottom: 8px;
+        }
+        
+        .footer {
+            background: #fff;
+            padding: 10px 0 8px 0;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 0 0 24px 24px;
+        }
+        .footer-btn {
+            background: #1a6b54;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 32px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(26,107,84,0.13);
+            transition: background 0.2s;
+        }
+        .footer-btn:active, .footer-btn:hover { background: #0a3d2f; }
+        /* 放大图片弹窗 */
+        .modal {
+            display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-img { max-width: 90vw; max-height: 70vh; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.25); }
+        .modal-close { position: absolute; top: 30px; right: 30px; color: #fff; font-size: 2.2rem; cursor: pointer; }
+        @media (min-width: 768px) {
+            body { flex-direction: row; padding: 30px; gap: 30px; }
+            .design-notes { flex: 0 0 300px; margin-bottom: 0; align-self: flex-start; }
+            .mobile-prototype { flex: 1; max-width: 100%; }
+        }
+        .keyframes-table { width: 100%; }
+        .keyframes-header, .keyframes-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+        }
+        .keyframes-header span { flex: 1; text-align: center; font-weight: bold; color: #1a6b54; }
+        .keyframes-row { margin-bottom: 10px; }
+        .keyframe-item { flex: 1; background: #f8f9fa; border-radius: 10px; text-align: center; }
+        .keyframe-placeholder { height: 48px; display: flex; align-items: center; justify-content: center; color: #bbb; }
+        .modal-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        #modalPrev { left: 20px; }
+        #modalNext { right: 20px; }
+    </style>
+</head>
+<body>
+    <!-- 移动端原型 -->
+    <div class="mobile-prototype">
+        <div class="header">
+            <p>查看您的挥杆分析与关键动作</p>
+        </div>
+        <div class="content">
+            <!-- 分析视频区 -->
+            <div class="video-section">
+                <div class="video-title">分析结果视频</div>
+                <div class="video-controls">
+                    <button class="video-btn active" id="btnAnalysis">分析结果</button>
+                    <button class="video-btn" id="btnOriginal">原始视频</button>
+                </div>
+                <video class="video-player" id="mainVideo" controls preload="metadata" width="100%" poster="#">
+                    <source id="videoSource" src="{{ url_for('download_file', subdir=result.output_video.split('/')[0], filename=result.output_video.split('/')[-1]) }}" type="video/mp4">
+                    您的浏览器不支持视频播放。
+                </video>
+                <a class="download-link" href="{{ url_for('download_file', subdir=result.output_video.split('/')[0], filename=result.output_video.split('/')[-1]) }}">下载分析视频</a>
+            </div>
+            <!-- 关键帧对比区 -->
+            <div class="keyframes-section">
+                <div class="keyframes-title">关键动作对比</div>
+                <div class="keyframes-table">
+                    <div class="keyframes-header">
+                        <span>你的动作</span>
+                        <span>标准动作</span>
+                    </div>
+                    {% for frame in result.key_frames %}
+                    <div class="keyframes-row">
+                        <!-- 用户动作关键帧 -->
+                        <div class="keyframe-item" data-img="{{ url_for('static', filename=frame.user_image if frame.user_image else 'uploads/standard/key_frames/Unrecognized.jpg') }}" data-label="{{ frame.action }}" data-frame-idx="{{ loop.index0 }}" data-json="{{ frame.user_json if frame.user_json else '' }}">
+                            {% if frame.user_image %}
+                            <img class="keyframe-img" src="{{ url_for('static', filename=frame.user_image) }}" alt="{{ frame.action }}">
+                            {% else %}
+                            <img class="keyframe-img" src="{{ url_for('static', filename='uploads/standard/key_frames/Unrecognized.jpg') }}" alt="未识别">
+                            {% endif %}
+                            <div class="keyframe-label">{{ frame.action }}</div>
+                        </div>
+                        <!-- 标准动作关键帧 -->
+                        <div class="keyframe-item" data-img="{{ url_for('static', filename=frame.standard_image) }}" data-label="标准 {{ frame.action }}">
+                            <img class="keyframe-img" src="{{ url_for('static', filename=frame.standard_image) }}" alt="标准 {{ frame.action }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <!-- 分析结果显示区域 -->
+            <div class="analysis-section" id="analysisSection" style="display: none;">
+                <div class="analysis-title">动作分析结果</div>
+                <div class="analysis-content" id="analysisContent">
+                    <p>点击关键帧查看详细分析结果</p>
+                </div>
+            </div>
+            
+            <!-- 报告区域 -->
+            <div class="report-section">
+                <a href="{{ url_for('show_guide', key_frames=result.key_frames|tojson, differences_summary=result.differences_summary|tojson, detected_states=result.detected_states|tojson) }}">
+                    <button class="report-btn">查看正确姿态指南</button>
+                </a>
+                <a href="{{ url_for('show_ai_analysis', subdir=result.output_video.split('/')[0], filename=result.input_video.split('/')[-1]) }}">
+                    <button class="ai-analysis-btn">查看AI分析结果</button>
+                </a>
+            </div>
+        </div>
+        <!-- 底部操作栏 -->
+        <div class="footer">
+            <button class="footer-btn" onclick="window.location.href='{{ url_for('index') }}'">开始新的分析</button>
+        </div>
+    </div>
+    <!-- 放大图片弹窗 -->
+    <div class="modal" id="imgModal">
+        <span class="modal-close" id="modalClose">&times;</span>
+        <button class="modal-arrow" id="modalPrev" style="display:none;">&#8592;</button>
+        <img class="modal-img" id="modalImg" src="#" alt="关键帧大图">
+        <button class="modal-arrow" id="modalNext" style="display:none;">&#8594;</button>
+    </div>
+    <script>
+        // 视频切换
+        const btnAnalysis = document.getElementById('btnAnalysis');
+        const btnOriginal = document.getElementById('btnOriginal');
+        const mainVideo = document.getElementById('mainVideo');
+        const videoSource = document.getElementById('videoSource');
+        
+        // 视频路径配置
+        const isDemoVideo = "{{ result.output_video }}" === "dome_show/analyzed_demo_show.mp4";
+        const analysisVideoSrc = isDemoVideo ? 
+            "{{ url_for('demo_download_file', filename='analyzed_demo_show.mp4') }}" : 
+            "{{ url_for('download_file', subdir=result.output_video.split('/')[0], filename=result.output_video.split('/')[-1]) }}";
+        const originalVideoSrc = isDemoVideo ? 
+            "{{ url_for('static', filename='dome_show/demo_show.mp4') }}" : 
+            "{{ url_for('static', filename='uploads/' + result.input_video) }}";
+        
+        if (btnAnalysis) {
+            btnAnalysis.addEventListener('click', function() {
+                videoSource.src = analysisVideoSrc;
+                mainVideo.load();
+                btnAnalysis.classList.add('active');
+                btnOriginal.classList.remove('active');
+            });
+        }
+        
+        if (btnOriginal) {
+            btnOriginal.addEventListener('click', function() {
+                videoSource.src = originalVideoSrc;
+                mainVideo.load();
+                btnOriginal.classList.add('active');
+                btnAnalysis.classList.remove('active');
+            });
+        }
+        
+        // 页面初始化：设置默认视频源
+        document.addEventListener('DOMContentLoaded', function() {
+            // 默认加载分析视频（演示视频）或原视频（用户上传视频）
+            if (isDemoVideo) {
+                // 演示视频默认显示分析视频
+                videoSource.src = analysisVideoSrc;
+                mainVideo.load();
+                if (btnAnalysis) btnAnalysis.classList.add('active');
+                if (btnOriginal) btnOriginal.classList.remove('active');
+            } else {
+                // 用户上传视频默认显示原视频
+                videoSource.src = originalVideoSrc;
+                mainVideo.load();
+                if (btnOriginal) btnOriginal.classList.add('active');
+                if (btnAnalysis) btnAnalysis.classList.remove('active');
+            }
+        });
+        
+        // 关键帧放大与切换
+        const keyframeItems = document.querySelectorAll('.keyframe-item');
+        const imgModal = document.getElementById('imgModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalClose = document.getElementById('modalClose');
+        const modalPrev = document.getElementById('modalPrev');
+        const modalNext = document.getElementById('modalNext');
+        let currentIndex = 0;
+        let imgList = Array.from(keyframeItems).map(item => item.dataset.img);
+        
+        function showModal(index) {
+            if(index < 0) index = 0;
+            if(index >= imgList.length) index = imgList.length - 1;
+            currentIndex = index;
+            modalImg.src = imgList[currentIndex];
+            imgModal.classList.add('active');
+            // 控制左右按钮显示
+            if(currentIndex === 0) {
+                modalPrev.style.display = 'none';
+            } else {
+                modalPrev.style.display = '';
+            }
+            if(currentIndex === imgList.length - 1) {
+                modalNext.style.display = 'none';
+            } else {
+                modalNext.style.display = '';
+            }
+        }
+        
+        keyframeItems.forEach((item, idx) => {
+            item.addEventListener('click', function() {
+                imgList = Array.from(keyframeItems).map(i => i.dataset.img);
+                showModal(idx);
+                
+                // 加载JSON分析结果
+                const jsonPath = item.dataset.json;
+                if (jsonPath) {
+                    loadAnalysisResult(jsonPath, item.dataset.label);
+                }
+            });
+        });
+        
+        // 加载分析结果
+        function loadAnalysisResult(jsonPath, actionName) {
+            const analysisSection = document.getElementById('analysisSection');
+            const analysisContent = document.getElementById('analysisContent');
+            
+            // 显示分析区域
+            analysisSection.style.display = 'block';
+            
+            // 显示加载状态
+            analysisContent.innerHTML = `
+                <h4>${actionName}</h4>
+                <p>正在加载分析结果...</p>
+            `;
+            
+            // 加载JSON文件
+            fetch(jsonPath)
+                .then(response => response.json())
+                .then(data => {
+                    analysisContent.innerHTML = `
+                        <h4>${actionName}</h4>
+                        <p>${data.description || '暂无分析结果'}</p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('加载分析结果失败:', error);
+                    analysisContent.innerHTML = `
+                        <h4>${actionName}</h4>
+                        <p>加载分析结果失败，请稍后重试。</p>
+                    `;
+                });
+        }
+        
+        modalPrev.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showModal(currentIndex - 1);
+        });
+        
+        modalNext.addEventListener('click', function(e) {
+            e.stopPropagation();
+            showModal(currentIndex + 1);
+        });
+        
+        modalClose.addEventListener('click', function() {
+            imgModal.classList.remove('active');
+        });
+        
+        imgModal.addEventListener('click', function(e) {
+            if (e.target === imgModal) imgModal.classList.remove('active');
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (!imgModal.classList.contains('active')) return;
+            if (e.key === 'Escape') imgModal.classList.remove('active');
+            if (e.key === 'ArrowLeft' && currentIndex > 0) showModal(currentIndex - 1);
+            if (e.key === 'ArrowRight' && currentIndex < imgList.length - 1) showModal(currentIndex + 1);
+        });
+    </script>
+</body>
+</html>

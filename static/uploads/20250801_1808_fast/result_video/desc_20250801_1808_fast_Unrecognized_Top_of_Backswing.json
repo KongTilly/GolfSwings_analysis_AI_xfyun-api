@@ -1,0 +1,10 @@
+{
+  "image_path": "uploads/standard/key_frames/Unrecognized.jpg",
+  "subdir": "20250801_1808_fast",
+  "filename": "Unrecognized.jpg",
+  "description": "GolfSwingsAssistant懵了\n这球杆去哪儿了？没识别到完整的挥杆动作哦。\n请您帮忙检查视频是否拍全了，学学'参考视频' 的范儿，再上传一次呗？",
+  "prompt": "Top_of_Backswing动作",
+  "action": "Top_of_Backswing",
+  "frame_idx": null,
+  "timestamp": "2025-08-01T18:09:09.638243"
+}
