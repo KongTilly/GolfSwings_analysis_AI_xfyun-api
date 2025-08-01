@@ -634,12 +634,13 @@ def analyze_golf_swing(input_video_path, output_dir, progress_callback=None):
         def save_and_evaluate_keyframe(frame_idx, frame, keypoints, confidences, angles, action):
             """
             保存关键帧图像并进行姿势判定
-            frame_idx: 帧索引
-            frame: 原始帧图像
-            keypoints: 关键点坐标
-            confidences: 关键点置信度
-            angles: 角度值字典
-            action: 动作名称
+            
+            frame_idx (int): 帧索引
+            frame (numpy.ndarray): 原始帧图像
+            keypoints (list): 关键点坐标列表
+            confidences (list): 关键点置信度列表
+            angles (dict): 角度值字典
+            action (str): 动作名称
             """
             # 创建带标注的帧副本
             annotated_frame = frame.copy()

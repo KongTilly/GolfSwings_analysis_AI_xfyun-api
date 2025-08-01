@@ -15,23 +15,11 @@ class CacheManager:
     """缓存管理器类"""
     
     def __init__(self, upload_folder: str):
-        """初始化缓存管理器
-        
-        Args:
-            upload_folder (str): 上传文件夹路径
-        """
+        """初始化缓存管理器"""
         self.upload_folder = upload_folder
     
     def get_cache_path(self, subdir: str, action: str) -> Optional[str]:
-        """获取缓存文件路径
-        
-        Args:
-            subdir (str): 子目录名
-            action (str): 动作类型
-            
-        Returns:
-            Optional[str]: 缓存文件路径，如果未找到则返回None
-        """
+        """获取缓存文件路径"""
         cache_dir = os.path.join(self.upload_folder, subdir, 'result_video')
         
         # 首先尝试查找正常的动作JSON文件
@@ -52,14 +40,7 @@ class CacheManager:
         return None
     
     def load_cache_data(self, cache_path: str) -> Optional[Dict[str, Any]]:
-        """加载缓存数据
-        
-        Args:
-            cache_path (str): 缓存文件路径
-            
-        Returns:
-            Optional[Dict[str, Any]]: 缓存数据，如果加载失败则返回None
-        """
+        """加载缓存数据"""
         try:
             with open(cache_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
@@ -68,16 +49,7 @@ class CacheManager:
             return None
     
     def save_cache_data(self, subdir: str, filename: str, data: Dict[str, Any]) -> bool:
-        """保存缓存数据
-        
-        Args:
-            subdir (str): 子目录名
-            filename (str): 文件名
-            data (Dict[str, Any]): 要保存的数据
-            
-        Returns:
-            bool: 保存是否成功
-        """
+        """保存缓存数据"""
         try:
             cache_dir = os.path.join(self.upload_folder, subdir, 'result_video')
             os.makedirs(cache_dir, exist_ok=True)
@@ -95,15 +67,7 @@ class CacheManager:
             return False
     
     def get_cached_analysis(self, subdir: str, action: str) -> Optional[Dict[str, Any]]:
-        """获取缓存的分析结果
-        
-        Args:
-            subdir (str): 子目录名
-            action (str): 动作类型
-            
-        Returns:
-            Optional[Dict[str, Any]]: 缓存的分析结果，如果未找到则返回None
-        """
+        """获取缓存的分析结果"""
         cache_path = self.get_cache_path(subdir, action)
         if cache_path:
             return self.load_cache_data(cache_path)
@@ -111,18 +75,7 @@ class CacheManager:
     
     def save_analysis_result(self, subdir: str, action: str, img_filename: str, 
                            analysis_result: str, image_path: str) -> bool:
-        """保存分析结果到缓存
-        
-        Args:
-            subdir (str): 子目录名
-            action (str): 动作类型
-            img_filename (str): 图片文件名
-            analysis_result (str): 分析结果
-            image_path (str): 图片路径
-            
-        Returns:
-            bool: 保存是否成功
-        """
+        """保存分析结果到缓存"""
         cache_data = {
             'image_path': image_path,
             'subdir': subdir,
@@ -137,15 +90,7 @@ class CacheManager:
         return self.save_cache_data(subdir, img_filename, cache_data)
     
     def clear_cache(self, subdir: str, filename: str) -> bool:
-        """清除指定文件的缓存
-        
-        Args:
-            subdir (str): 子目录名
-            filename (str): 文件名
-            
-        Returns:
-            bool: 清除是否成功
-        """
+        """清除指定文件的缓存"""
         try:
             progress_path = os.path.join(self.upload_folder, subdir, f'progress_{filename}.txt')
             if os.path.exists(progress_path):

@@ -116,13 +116,9 @@ class DemoConfig:
     
     def _create_demo_ai_result(action, frame_num):
         """创建演示AI结果数据
-        
         Args:
             action (str): 动作类型
             frame_num (int): 帧号
-            
-        Returns:
-            dict: AI结果数据
         """
         return {
             'action': action,
@@ -156,13 +152,6 @@ class ErrorMessages:
     ACTION_NOT_RECOGNIZED = '无法识别动作类型'
 
 def allowed_file(filename):
-    """检查文件扩展名是否允许
-    
-    Args:
-        filename (str): 文件名
-        
-    Returns:
-        bool: 是否允许的文件类型
-    """
+    """检查文件扩展名是否允许"""
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in FlaskConfig.ALLOWED_EXTENSIONS 

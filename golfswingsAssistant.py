@@ -209,7 +209,6 @@ class SparkWebSocketClient:
         return self.result["answer"]
 
 
-
 def assistant_answer(action, img_path, subdir=None):
     """
     调用星火API，返回针对特定动作的分析结果字符串。异常时返回错误信息字符串。

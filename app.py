@@ -30,17 +30,7 @@ os.environ['MODEL_PATH'] = FlaskConfig.MODEL_PATH
 cache_manager = CacheManager(app.config['UPLOAD_FOLDER'])
 
 def analyze_golf_swing_with_progress(video_path, output_dir, filename, subdir):
-    """带进度跟踪的高尔夫挥杆分析
-    
-    Args:
-        video_path (str): 输入视频文件路径
-        output_dir (str): 输出目录路径
-        filename (str): 文件名
-        subdir (str): 子目录名
-        
-    Returns:
-        dict: 分析结果
-    """
+    """带进度跟踪的高尔夫挥杆分析"""
     def progress_callback(progress):
         write_progress(app.config['UPLOAD_FOLDER'], subdir, filename, progress)
     
@@ -65,15 +55,7 @@ def analyze_golf_swing_with_progress(video_path, output_dir, filename, subdir):
     return result
 
 def process_ai_analysis(subdir, action_images):
-    """处理AI分析结果
-    
-    Args:
-        subdir (str): 子目录名
-        action_images (dict): 动作图片映射
-        
-    Returns:
-        list: AI分析结果列表
-    """
+    """处理AI分析结果"""
     ai_analysis_results = []
     
     for action in GOLF_ACTIONS:
@@ -135,39 +117,19 @@ def show_history():
 
 @app.route('/progress/<subdir>/<filename>')
 def get_progress(subdir, filename):
-    """获取分析进度
-    
-    Args:
-        subdir (str): 子目录名
-        filename (str): 文件名
-        
-    Returns:
-        json: 进度信息
-    """
+    """获取分析进度"""
     progress = read_progress(app.config['UPLOAD_FOLDER'], subdir, filename)
     return jsonify(progress)
 
 @app.route('/check_files/<subdir>/<filename>')
 def check_files(subdir, filename):
-    """检查关键帧文件是否已生成
-    
-    Args:
-        subdir (str): 子目录名
-        filename (str): 文件名
-        
-    Returns:
-        json: 文件状态信息
-    """
+    """检查关键帧文件是否已生成"""
     file_status = check_keyframe_files(app.config['UPLOAD_FOLDER'], subdir)
     return jsonify(file_status)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    """处理视频文件上传并启动分析
-    
-    Returns:
-        json: 任务信息或重定向
-    """
+    """处理视频文件上传并启动分析"""
     if 'video' not in request.files:
         return redirect(request.url)
     
@@ -202,15 +164,7 @@ def show_guide():
 
 @app.route('/ai_analysis/<subdir>/<filename>')
 def show_ai_analysis(subdir, filename):
-    """显示AI分析结果页面
-    
-    Args:
-        subdir (str): 子目录名
-        filename (str): 文件名
-        
-    Returns:
-        str: 渲染的HTML页面
-    """
+    """显示AI分析结果页面"""
     try:
         if subdir == DemoConfig.DEMO_SUBDIR:
             return render_template('ai_analysis.html', 
@@ -228,15 +182,7 @@ def show_ai_analysis(subdir, filename):
 
 @app.route('/results/<subdir>/<filename>')
 def show_results(subdir, filename):
-    """显示分析结果页面
-    
-    Args:
-        subdir (str): 子目录名
-        filename (str): 文件名
-        
-    Returns:
-        str: 渲染的HTML页面
-    """
+    """显示分析结果页面"""
     cache_manager.clear_cache(subdir, filename)
     key_frames = format_keyframe_data(app.config['UPLOAD_FOLDER'], subdir)
     
@@ -251,11 +197,7 @@ def show_results(subdir, filename):
 
 @app.route('/demo_results')
 def show_demo_results():
-    """显示演示结果页面
-    
-    Returns:
-        str: 渲染的HTML页面
-    """
+    """显示演示结果页面"""
     result_data = {
         'input_video': f'{DemoConfig.DEMO_SUBDIR}/{DemoConfig.DEMO_FILENAME}',
         'output_video': f'{DemoConfig.DEMO_SUBDIR}/analyzed_{DemoConfig.DEMO_FILENAME}',
@@ -267,15 +209,7 @@ def show_demo_results():
 
 @app.route('/download/<subdir>/<filename>')
 def download_file(subdir, filename):
-    """下载分析结果视频文件
-    
-    Args:
-        subdir (str): 子目录名
-        filename (str): 文件名
-        
-    Returns:
-        file: 文件下载响应
-    """
+    """下载分析结果视频文件"""
     return send_from_directory(
         os.path.join(app.config['UPLOAD_FOLDER'], subdir, 'result_video'), 
         filename, as_attachment=True
@@ -283,23 +217,12 @@ def download_file(subdir, filename):
 
 @app.route('/demo_download/<filename>')
 def demo_download_file(filename):
-    """下载演示视频文件
-    
-    Args:
-        filename (str): 文件名
-        
-    Returns:
-        file: 文件下载响应
-    """
+    """下载演示视频文件"""
     return send_from_directory('static/dome_show/result_video', filename, as_attachment=True)
 
 @app.route('/api/describe_image', methods=['POST'])
 def api_describe_image():
-    """API接口：获取图片描述
-    
-    Returns:
-        json: 图片描述结果
-    """
+    """API接口：获取图片描述"""
     try:
         data = request.get_json()
         if not data or 'image_path' not in data:
