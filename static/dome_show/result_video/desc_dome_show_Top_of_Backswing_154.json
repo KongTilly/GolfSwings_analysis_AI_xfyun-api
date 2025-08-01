@@ -1,0 +1,10 @@
+{
+  "image_path": "static/dome_show/key_frames/Top_of_Backswing_154.jpg",
+  "subdir": "dome_show",
+  "filename": "Top_of_Backswing_154.jpg",
+  "description": "这张高尔夫球上杆顶点图片展示了一些关键数据和要点：\n1. **上杆幅度**：俱乐部水平角为2.4度，表明上杆幅度适中。\n2. **身体旋转**：肩部X位置为333.4度，显示了身体的旋转情况。\n3. **手臂位置**：手臂在上杆顶点时保持伸直，有助于增加击球距离。\n4. **技术要点**：上杆顶点应保持平衡，避免过度旋转或手臂弯曲，以确保挥杆的流畅性和准确性。",
+  "prompt": "Top_of_Backswing动作",
+  "action": "Top_of_Backswing",
+  "frame_idx": 154,
+  "timestamp": "2025-03-04T00:00:00"
+}

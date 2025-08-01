@@ -1,0 +1,10 @@
+{
+  "image_path": "static/dome_show/key_frames/Impact_187.jpg",
+  "subdir": "dome_show",
+  "filename": "Impact_187.jpg",
+  "description": "从图片看，击球姿势存在一定问题。身体角度方面，左肩 - 脚踝垂直度偏差较大（82.0°），与标准值84.0°相比有明显偏离；手臂位置上，双臂未充分延展以增加击球距离；击球瞬间技术要点上，挥杆轨迹不够流畅，可能导致击球效果不佳。建议调整身体姿态和挥杆动作，提升击球质量。",
+  "prompt": "Impact动作",
+  "action": "Impact",
+  "frame_idx": 187,
+  "timestamp": "2025-03-04T00:00:00"
+}

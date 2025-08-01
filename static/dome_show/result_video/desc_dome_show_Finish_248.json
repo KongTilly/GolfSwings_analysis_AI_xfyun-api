@@ -1,0 +1,10 @@
+{
+  "image_path": "static/dome_show/key_frames/Finish_248.jpg",
+  "subdir": "dome_show",
+  "filename": "Finish_248.jpg",
+  "description": "收杆时，右肩与踝垂直，角度正确。身体平衡良好，重心稳定于双脚。双臂自然伸展，杆头轨迹平滑，指向目标。此阶段技术要点为保持姿势稳定，确保挥杆动作的连贯性与准确性，同时注意身体的协调性和杆头的最终位置。",
+  "prompt": "Finish动作",
+  "action": "Finish",
+  "frame_idx": 248,
+  "timestamp": "2025-03-04T00:00:00"
+}

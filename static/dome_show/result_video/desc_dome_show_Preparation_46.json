@@ -1,0 +1,10 @@
+{
+  "image_path": "static/dome_show/key_frames/Preparation_46.jpg",
+  "subdir": "dome_show",
+  "filename": "Preparation_46.jpg",
+  "description": "站位：双脚平行，与肩同宽，膝盖微曲。  \n握杆姿势：双手自然握住球杆，手腕放松。  \n身体平衡：重心均匀分布在两脚上，避免前倾或后仰。  \n准备阶段要点：头部保持稳定，视线专注于球，双臂和肩膀保持放松状态，为挥杆做好充分准备。",
+  "prompt": "Preparation动作",
+  "action": "Preparation",
+  "frame_idx": 46,
+  "timestamp": "2025-03-04T00:00:00"
+}
