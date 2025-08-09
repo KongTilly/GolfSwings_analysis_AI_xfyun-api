@@ -101,7 +101,7 @@ def process_ai_analysis(subdir, action_images):
                 'timestamp': '',
                 'image_path': construct_image_path(subdir, img_filename) if img_filename else get_unrecognized_image_path()
             })
-    
+
     return ai_analysis_results
 
 @app.route('/', methods=['GET'])
@@ -220,6 +220,7 @@ def demo_download_file(filename):
     """下载演示视频文件"""
     return send_from_directory('static/dome_show/result_video', filename, as_attachment=True)
 
+
 @app.route('/api/describe_image', methods=['POST'])
 def api_describe_image():
     """API接口：获取图片描述"""
@@ -269,6 +270,7 @@ def api_describe_image():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
